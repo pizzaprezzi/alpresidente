@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html ng-app="myApp" ng-controller="MyController" class="my-controller">
+
+<head>
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!--
+
+-->
+<!-- riferimenti remoti -->
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<!-- angular -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.7/angular-locale_it-it.js"></script>
+
+<script src="https://use.fontawesome.com/99ef16724b.js"></script>
+
+<link rel="stylesheet" href="style.css" />
+<script src="app.js"></script>
+
+<title>{{ entity.Name }} - PizzaPrezzi</title>  
+</head>
+
+<body>
+<div class="container">
+
+<!-- menu -->
+<nav class="navbar navbar-inverse noprint">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="//pizzaprezzi.it">PizzaPrezzi</a>
+		</div>
+	<ul class="nav navbar-nav">
+		<li class="active"><a href=".">{{ entity.Name }}</a></li>
+	</ul>
+	<ul class="nav navbar-nav navbar-right">
+		<form style="padding-top: 13px;" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+			<input type="hidden" name="cmd" value="_s-xclick">
+			<input type="hidden" name="hosted_button_id" value="C3JEBSSYR4GBQ">
+			<input type="image" src="https://www.paypalobjects.com/it_IT/IT/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal è il metodo rapido e sicuro per pagare e farsi pagare online.">
+			<img alt="" border="0" src="https://www.paypalobjects.com/it_IT/i/scr/pixel.gif" width="1" height="1">
+			</form>                       
+	</ul>
+	</div>
+</nav>
+<!-- fine menu -->
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">Esporta dati</div>
+  <div class="panel-body">
+	<input type='file' accept='.json' onchange='angular.element(this).scope().uploadedFile(this)' id="file" class="inputfile"><label for="file" class="btn btn-default">Apri configurazione esistente</label>
+	<button class="btn btn-info" ng-click="getJson()">Prepara Archivio</button>
+	<a href="" class="btn btn-success" role="button" id="getJson" style="visibility:hidden" ng-click="hideJson()">Scarica</a>
+	<!--<span id="getJson"></span>-->
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Dati Locale</strong></div>
+  <div class="panel-body">
+	<div class="form-group">
+	  <label for="Name">Nome Locale:</label>
+	  <input type="text" class="form-control" id="Name" ng-model="entity.Name">
+	</div>  
+	<div class="form-group">
+	  <label for="Alias">Alias:</label>
+	  <input type="text" class="form-control" id="Alias" ng-model="entity.Alias">
+	</div>  	
+	<div class="form-group">
+	  <label for="Address">Indirizzo:</label>
+	  <input type="text" class="form-control" id="Address" ng-model="entity.Address">
+	</div>
+	<div class="form-group">
+	  <label for="Name">Latitude:</label>
+	  <input type="text" class="form-control" id="Latitude" ng-model="entity.Latitude">
+	</div>
+	<div class="form-group">
+	  <label for="Name">Longitude:</label>
+	  <input type="text" class="form-control" id="Longitude" ng-model="entity.Longitude">
+	</div>	
+	<div class="form-group">
+	  <label for="Name">Sito Web:</label>
+	  <input type="text" class="form-control" id="Website" ng-model="entity.Website">
+	</div>	
+  </div>
+</div>
+
+
+<div class="panel panel-default">
+	<div class="panel-heading"><strong>Telefono </strong></div>
+	<div class="panel-body">
+		<div class="form-group" ng-repeat="c in entity.Contact">
+			<label for="Contact{{$index}}">Telefono {{$index+1}}:</label>
+			<div class="input-group">
+				<input type="text" class="form-control" id="Contact{{$index}}" ng-model="c.Value">
+				<span class="input-group-btn">
+					<button class="btn btn-danger" ng-click="removeContact($index)">Rimuovi</button>
+				</span>
+			</div>	  
+		</div>
+		<button class="btn btn-success" ng-click="addContact()">Aggiungi</button>		
+	</div>
+</div>
+
+
+<div class="container">
+<button class="btn btn-success" ng-click="addCat()">Aggiungi categoria</button>		
+<ul class="nav nav-tabs noprint" style="padding-top: 5px;padding-bottom: 5px;">
+	<li ng-repeat="c in entity.Categories" ng-class="{'active':c.Alias === entity.Categories[0].Alias}"><a data-toggle="tab" href="#{{ c.Alias }}">{{ c.Name }}</a>
+</ul>
+
+<div class="tab-content">
+	<div id="{{ c.Alias }}" class="tab-pane fade"  ng-repeat="c in entity.Categories" ng-class="{'in active':c.Alias === entity.Categories[0].Alias}">
+	<br />
+	<div class="panel panel-default">
+	  <div class="panel-heading">Dati Categoria</div>
+	  <div class="panel-body">
+		<div class="form-group">
+			<label for="Name">Categoria:</label>
+			<input type="text" class="form-control" id="Website" ng-model="c.Name">
+		</div>
+		<div class="form-group">
+			<label for="Name">Alias:</label>
+			<input type="text" class="form-control" id="Website" ng-model="c.Alias">
+		</div>
+		<button class="btn btn-danger" ng-click="removeCat($index)">Rimuovi categoria</button>
+			<div class="panel panel-default" >
+			  <div class="panel-heading" >Tariffe</div>
+			  <div class="panel-body">
+						<div class="input-group" ng-repeat="t in c.Prices" style="padding-top: 5px;padding-bottom: 5px;"><input type="text" class="form-control" ng-model="t.Value">
+						<span class="input-group-btn">
+						<button class="btn btn-danger" ng-click="removeTr(c.Prices,$index)">Rimuovi</button>
+						</span></div><button class="btn btn-success" ng-click="addTr(c.Prices)" style="padding-top: 5px;padding-bottom: 5px;">Aggiungi</button>				  
+			  </div>
+			</div>
+		</div>
+	</div>	
+		<table class="table table-bordered table-responsive">
+			<thead>
+				<tr>
+					<th width="10%"><button class="btn btn-success" ng-click="addEt(c.Entities)" style="padding-top: 5px;padding-bottom: 5px;">Aggiungi</button>	</th>
+					<th width="30%">Nome</th>
+					<th width="30%">Ingredienti</th>
+					<th width="30%">Prezzo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="p in c.Entities">
+					<td width="10%"><button class="btn btn-danger" ng-click="removeEt(c.Entities,$index)" style="padding-bottom: 5px;">Rimuovi</button></td>
+					<td width="30%"><input type="text" class="form-control" ng-model="p.Name"></td>
+					<td width="30%">
+						<div class="input-group" ng-repeat="i in p.Items" style="padding-bottom: 5px;"><input type="text" class="form-control" ng-model="i.Value">
+						<span class="input-group-btn">
+						<button class="btn btn-danger" ng-click="removeIt(p.Items,$index)">Rimuovi</button>
+						</span></div><button class="btn btn-success" ng-click="addIt(p.Items)" style="padding-bottom: 5px;">Aggiungi</button>
+					</td>
+					<td width="30%">
+						<div class="form-group" ng-repeat="pr in p.Prices">
+						<label for="Name">{{c.Prices[$index].Value}}</label>
+						<div class="input-group"  style="padding-bottom: 5px;"><input type="text" class="form-control" ng-model="pr.Value">
+						<span class="input-group-btn">
+						<button class="btn btn-danger" ng-click="removePr(p.Prices,$index)">Rimuovi</button>
+						</span></div></div>
+						<button class="btn btn-success" ng-click="addPr(p.Prices)" style="padding-top: 5px;padding-bottom: 5px;">Aggiungi</button>					
+					</td>
+					<!--<td><button  ng-repeat="pr in p.Prices" class="btn btn-success" ng-click="addItem(p,pr)"><i class="fa fa-cart-plus" aria-hidden="true"></i> {{c.Prices[$index].Value }} {{pr.Value|currency}}</button></td>
+					<td><b>{{ p.Name }}</b><p><small><span ng-repeat="i in p.Items">{{ i.Value }}, </span></small></p></td>-->
+				</tr>
+			</tbody>    
+		</table>
+	</div>
+</div>
+</div>
+
+</body>
+
+</html>
